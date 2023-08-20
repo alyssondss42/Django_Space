@@ -18,8 +18,10 @@ def login(request):
 
             if usuario is not None:
                 auth.login(request, usuario)
+                messages.success(request, message=f"{nome} logado com sucesso")
                 return redirect('index')
             else:
+                messages.error(request, message="Erro ao efetuar login")
                 return redirect('login')
 
     return render(request, 'usuarios/login.html', {"form": form})
@@ -33,6 +35,7 @@ def cadastro(request):
 
         if form.is_valid():
             if form['senha_1'].value() != form['senha_2'].value():
+                messages.error(request, message="Senhas não são iguais")
                 return redirect('cadastro')
 
             nome = form['nome_cadastro'].value()
@@ -40,13 +43,14 @@ def cadastro(request):
             senha = form['senha_1'].value()
 
             if User.objects.filter(username=nome).exists():
+                messages.error(request, message="Usuário já existente")
                 return redirect('cadastro')
 
             usuario = User.objects.create_user(username=nome,
                                                password=senha,
                                                email=email)
             usuario.save()
-
+            messages.success(request, message="Cadastro efetuado com sucesso")
             return redirect('login')
 
 
